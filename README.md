@@ -1,2 +1,2 @@
-# issue-tracker
- 
+# Issue Tracker (Backend)
+The Backend of Issue Tracker app.
