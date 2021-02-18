@@ -1,4 +1,4 @@
-package services
+package database
 
 import (
 	"log"
@@ -11,7 +11,8 @@ import (
 
 var DB *gorm.DB
 
-func ConnectDatabase() {
+// Initialize DB's connection and migration.
+func InitializeDB() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err)
@@ -22,5 +23,5 @@ func ConnectDatabase() {
 		log.Fatal(err)
 	}
 
-	db.AutoMigrate()
+	DB = db
 }
