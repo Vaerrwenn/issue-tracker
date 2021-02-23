@@ -16,7 +16,20 @@ type User struct {
 	Password []byte
 }
 
+// SaveUserData saves a User's data from Register.
+// Returns error if failed.
 func (u *User) SaveUserData() error {
 	err := database.DB.Create(&u).Error
 	return err
+}
+
+func (u *User) GetUserByEmail() *User {
+	var result = &User{}
+	err := database.DB.Where(map[string]interface{}{
+		"email": u.Email,
+	}).First(&result).Error
+	if err != nil {
+		return nil
+	}
+	return result
 }

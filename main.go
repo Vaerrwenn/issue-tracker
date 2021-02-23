@@ -1,8 +1,9 @@
 package main
 
 import (
-	controllers "issue-tracker/controllers"
+	"issue-tracker/controllers"
 	"issue-tracker/database"
+	"issue-tracker/middlewares"
 	migrations "issue-tracker/migrations"
 	"log"
 	"os"
@@ -35,8 +36,17 @@ func main() {
 
 	v1 := r.Group("/v1")
 	{
-		v1.POST("/register", controllers.CreateUser)
-		v1.POST("/login")
+		public := v1.Group("/public")
+		{
+			public.POST("/register", controllers.RegisterHandler)
+			public.POST("/login", controllers.LoginHandler)
+		}
+
+		protected := v1.Group("/protected").Use(middlewares.AuthJWT())
+		{
+			// TODO
+			protected.GET("/")
+		}
 	}
 
 	r.Run(":" + port)
