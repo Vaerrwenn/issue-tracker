@@ -3,7 +3,7 @@ package middlewares
 import (
 	"issue-tracker/auth"
 	"net/http"
-	"strings"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,33 +12,44 @@ import (
 // trying to use an API is authenticated or not.
 func AuthJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// err := godotenv.Load()
+		// if err != nil {
+		// 	log.Fatal("Error loading ENV file.")
+		// }
 		// Get the 'authorization' from the Header.
-		clientToken := c.Request.Header.Get("authorization")
+		clientToken := c.Request.Header.Get("token")
 		if clientToken == "" {
-			c.JSON(http.StatusForbidden, "No authorization header provided")
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "No token in header",
+			})
 			c.Abort()
 			return
 		}
-
-		// Gets the token
-		extractedToken := strings.Split(clientToken, "Bearer ")
-		if len(extractedToken) == 2 {
-			clientToken = strings.TrimSpace(extractedToken[1])
-		} else {
-			c.JSON(http.StatusBadRequest, "Incorrect format of Authorization token")
-			c.Abort()
-			return
-		}
+		// log.Println(clientToken)
+		// // Splits the Bearer and the token. (Used if the token has "Bearer " in front)
+		// extractedToken := strings.Split(clientToken, "Bearer ")
+		// log.Println(extractedToken)
+		// if len(extractedToken) == 2 {
+		// 	clientToken = strings.TrimSpace(extractedToken[1])
+		// } else {
+		// 	c.JSON(http.StatusBadRequest, gin.H{
+		// 		"error": "Incorrect format of Authorization token",
+		// 	})
+		// 	c.Abort()
+		// 	return
+		// }
 
 		// Check whether the Token is valid.
 		jwtWrapper := auth.JwtWrapper{
-			SecretKey: "verysecretkey",
+			SecretKey: os.Getenv("JWT_SECRET"),
 			Issuer:    "AuthService",
 		}
 
 		claims, err := jwtWrapper.ValidateToken(clientToken)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, err.Error())
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": err.Error(),
+			})
 			c.Abort()
 			return
 		}

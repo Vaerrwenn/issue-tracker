@@ -42,11 +42,15 @@ func main() {
 			public.POST("/login", controllers.LoginHandler)
 		}
 
-		protected := v1.Group("/protected").Use(middlewares.AuthJWT())
+		protected := v1.Group("/protected")
+		protected.Use(middlewares.AuthJWT())
 		{
-			// TODO
-			protected.GET("/")
+			issue := protected.Group("/issue")
+			{
+				issue.POST("/create", middlewares.RoleAuth("1"), controllers.CreateIssueHandler)
+			}
 		}
+
 	}
 
 	r.Run(":" + port)

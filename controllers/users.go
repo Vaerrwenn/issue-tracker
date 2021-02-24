@@ -5,6 +5,7 @@ import (
 	auth "issue-tracker/auth"
 	"issue-tracker/models"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -12,17 +13,17 @@ import (
 
 // RegisterForm binds the data from the Registration Form to the struct.
 type RegisterForm struct {
-	RoleID   int    `form:"role" json:"role" binding:"required"`
-	Name     string `form:"name" json:"name" binding:"required"`
-	Email    string `form:"email" json:"email" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
+	RoleID   int    `form:"role" binding:"required"`
+	Name     string `form:"name" binding:"required"`
+	Email    string `form:"email" binding:"required"`
+	Password string `form:"password" binding:"required"`
 }
 
 // LoginForm binds the data from the Login form to the struct.
 type LoginForm struct {
-	Email      string `form:"email" json:"email" binding:"required"`
-	Password   string `form:"password" json:"password" binding:"required"`
-	Remembered bool   `form:"remember" json:"remember"`
+	Email      string `form:"email" binding:"required"`
+	Password   string `form:"password" binding:"required"`
+	Remembered bool   `form:"remember"`
 }
 
 type LoginResponse struct {
@@ -44,6 +45,7 @@ func RegisterHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
+		c.Abort()
 		return
 	}
 
@@ -53,6 +55,7 @@ func RegisterHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
+		c.Abort()
 		return
 	}
 
@@ -69,6 +72,7 @@ func RegisterHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
+		c.Abort()
 		return
 	}
 
@@ -132,7 +136,7 @@ func LoginHandler(c *gin.Context) {
 
 	// JWT generation
 	jwtWrapper := auth.JwtWrapper{
-		SecretKey:       "verysecretkey",
+		SecretKey:       os.Getenv("JWT_SECRET"),
 		Issuer:          "AuthService",
 		ExpirationHours: int64(expirationHours),
 	}
@@ -146,11 +150,18 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	tokenResponse := LoginResponse{
-		Token: signedToken,
-	}
+	// tokenResponse := LoginResponse{
+	// 	Token: signedToken,
+	// }
 
-	c.JSON(http.StatusOK, tokenResponse)
+	// c.JSON(http.StatusOK, tokenResponse)
+	c.JSON(http.StatusOK, gin.H{
+		"token":     signedToken,
+		"userID":    user.ID,
+		"userRole":  user.RoleID,
+		"userEmail": user.Email,
+		"userName":  user.Name,
+	})
 
 	return
 }

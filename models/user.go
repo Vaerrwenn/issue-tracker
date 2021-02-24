@@ -23,6 +23,8 @@ func (u *User) SaveUserData() error {
 	return err
 }
 
+// GetUserByEmail searches a User by presented Email.
+// Returns the User data.
 func (u *User) GetUserByEmail() *User {
 	var result = &User{}
 	err := database.DB.Where(map[string]interface{}{

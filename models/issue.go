@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"issue-tracker/database"
+
+	"gorm.io/gorm"
+)
 
 // Issue Belongs To User
 type Issue struct {
@@ -11,4 +15,9 @@ type Issue struct {
 	Body     string `gorm:"size:2000"`
 	Status   string `gorm:"size:1"` // 1 = Opened or 0 = Closed
 	Severity string `gorm:"size:1"` // 1 = Low, 2 = Medium, 3 = High
+}
+
+func (i *Issue) SaveIssue() error {
+	err := database.DB.Create(&i).Error
+	return err
 }
