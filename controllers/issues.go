@@ -46,6 +46,13 @@ func CreateIssueHandler(c *gin.Context) {
 		Status:   "1",
 		Severity: input.Severity,
 	}
+	if err := issue.ValidateIssue(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		c.Abort()
+		return
+	}
 	if err := issue.SaveIssue(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -59,5 +66,25 @@ func CreateIssueHandler(c *gin.Context) {
 		"issueID": issue.ID,
 	})
 
+	return
+}
+
+// IndexIssueHandler shows ALL issues. 😢😢😢😢😢
+func IndexIssueHandler(c *gin.Context) {
+	var issue models.Issue
+	result, err := issue.IndexIssues()
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		c.Abort()
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"qty":  len(result),
+		"data": result,
+	})
 	return
 }

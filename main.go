@@ -48,6 +48,7 @@ func main() {
 			issue := protected.Group("/issue")
 			{
 				issue.POST("/create", middlewares.RoleAuth("1"), controllers.CreateIssueHandler)
+				issue.GET("/index", controllers.IndexIssueHandler)
 			}
 		}
 
