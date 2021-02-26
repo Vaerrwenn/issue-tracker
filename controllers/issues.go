@@ -83,8 +83,31 @@ func IndexIssueHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"qty":  len(result),
+		"qty":  len(*result),
 		"data": result,
 	})
 	return
+}
+
+// ShowIssueHandler fetch ONE issue by ID.
+//
+// /v1/protected/issue/:id
+//
+// For example: /v1/protected/issue/1
+func ShowIssueHandler(c *gin.Context) {
+	var issue models.Issue
+
+	id := c.Param("id")
+	result, err := issue.FindIssueByID(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		c.Abort()
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": result,
+	})
 }

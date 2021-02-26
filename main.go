@@ -49,6 +49,7 @@ func main() {
 			{
 				issue.POST("/create", middlewares.RoleAuth("1"), controllers.CreateIssueHandler)
 				issue.GET("/index", controllers.IndexIssueHandler)
+				issue.GET("/show/:id", controllers.ShowIssueHandler)
 			}
 		}
 
