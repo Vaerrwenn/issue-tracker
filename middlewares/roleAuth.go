@@ -1,7 +1,9 @@
 package middlewares
 
 import (
+	"issue-tracker/models"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,21 +23,23 @@ func RoleAuth(allowedRole string) gin.HandlerFunc {
 		I might have the solution, but will do it if scaling is really required.
 	*/
 	return func(c *gin.Context) {
-		// Get userRole from Header
-		headerRole := c.Request.Header.Get("userRole")
-		if headerRole == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "No Role ID supplied.",
-			})
+		var user models.User
+		userID, err := strconv.Atoi(c.Request.Header.Get("userID"))
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			c.Abort()
 			return
 		}
 
-		// Check whether the
-		if headerRole != allowedRole {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "User with this role is unauthorized to access this Request.",
-			})
+		userRole, err := user.GetUserRoleByID(userID)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			c.Abort()
+			return
+		}
+
+		if userRole != allowedRole {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User is unauthorized to use this request."})
 			c.Abort()
 			return
 		}

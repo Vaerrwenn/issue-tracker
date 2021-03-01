@@ -8,22 +8,38 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// IssuesCreateForm takes User's input on Issue Create form.
-type IssuesCreateForm struct {
+// IssueCreateForm takes User's input on Issue Create form.
+type IssueCreateForm struct {
 	Title    string `form:"title" binding:"required"`
 	Body     string `form:"description" binding:"required"`
 	Severity string `form:"severity" binding:"required"`
 }
 
+// IssueUpdateForm is for Updating.
+type IssueUpdateForm struct {
+	Title    string `form:"title" binding:"required"`
+	Body     string `form:"description" binding:"required"`
+	Status   string `form:"status" binding:"required"`
+	Severity string `form:"severity" binding:"required"`
+}
+
+// returnErrorAndAbort returns a JSON with "error": errorText in it. After that,
+// it aborts and stop the running function.
+//
+// Takes Gin's context, the HTTP Code, and error text.
+func returnErrorAndAbort(ctx *gin.Context, code int, errorText string) {
+	ctx.JSON(code, gin.H{
+		"error": errorText,
+	})
+	ctx.Abort()
+}
+
 // CreateIssueHandler handles issue creation.
 func CreateIssueHandler(c *gin.Context) {
 	// Bind the input to variable.
-	var input IssuesCreateForm
+	var input IssueCreateForm
 	if err := c.ShouldBind(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		c.Abort()
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -32,10 +48,7 @@ func CreateIssueHandler(c *gin.Context) {
 	userID, err := strconv.Atoi(HeaderUserID)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		c.Abort()
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -47,23 +60,17 @@ func CreateIssueHandler(c *gin.Context) {
 		Severity: input.Severity,
 	}
 	if err := issue.ValidateIssue(); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		c.Abort()
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	if err := issue.SaveIssue(); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		c.Abort()
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data":    1,
-		"issueID": issue.ID,
+		"data": issue.ID,
+		"msg":  "Data succesfully created.",
 	})
 
 	return
@@ -75,10 +82,7 @@ func IndexIssueHandler(c *gin.Context) {
 	result, err := issue.IndexIssues()
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		c.Abort()
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -101,13 +105,81 @@ func ShowIssueHandler(c *gin.Context) {
 	result, err := issue.FindIssueByID(id)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		c.Abort()
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"data": result,
 	})
+}
+
+// UpdateIssueHandler is used for updating. Works similarly to CreateIssueHandler.
+//
+// Only the poster and developer can Update an Issue.
+func UpdateIssueHandler(c *gin.Context) {
+	var issue models.Issue
+	var user models.User
+
+	id := c.Param("id")
+	source, err := issue.FindFirstIssueByID(id)
+
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var input IssueUpdateForm
+	if err := c.ShouldBind(&input); err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	HeaderUserID := c.Request.Header.Get("userID")
+	userID, err := strconv.Atoi(HeaderUserID)
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	userRole, err := user.GetUserRoleByID(userID)
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if userID != source.UserID {
+		if userRole != "2" {
+			returnErrorAndAbort(c, http.StatusBadRequest, "User is unauthorized for this request.")
+			return
+		}
+	}
+
+	issue = models.Issue{
+		Title:    input.Title,
+		Body:     input.Body,
+		Status:   input.Status,
+		Severity: input.Severity,
+	}
+
+	if err := issue.ValidateIssue(); err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := issue.UpdateIssue(source); err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	idNum, err := strconv.Atoi(id)
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": idNum,
+		"msg":  "Data has been updated succesfully.",
+	})
+
+	return
 }

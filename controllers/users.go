@@ -26,6 +26,7 @@ type LoginForm struct {
 	Remembered bool   `form:"remember"`
 }
 
+// LoginResponse is used for token.
 type LoginResponse struct {
 	Token string `json:"token"`
 }

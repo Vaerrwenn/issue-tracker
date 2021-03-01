@@ -90,6 +90,7 @@ func (i *Issue) IndexIssues() (*[]IssueIndex, error) {
 }
 
 // FindIssueByID fetches an issue with provided ID.
+// It will return issue and user data that is needed for Show route.
 func (i *Issue) FindIssueByID(id string) (*IssueShow, error) {
 	var result IssueShow
 	query := database.DB.Model(&Issue{}).
@@ -115,4 +116,21 @@ func (i *Issue) FindIssueByID(id string) (*IssueShow, error) {
 		return nil, query.Error
 	}
 	return &result, nil
+}
+
+// FindFirstIssueByID finds an issue by ID.
+// It will only return Issue data, without user's data.
+func (i *Issue) FindFirstIssueByID(id string) (*Issue, error) {
+	var result Issue
+	query := database.DB.Where("id = ?", id).First(&result)
+
+	if query.Error != nil {
+		return nil, fmt.Errorf("ERROR: could not find issue with ID: %s", id)
+	}
+	return &result, nil
+}
+
+func (i *Issue) UpdateIssue(origin *Issue) error {
+	err := database.DB.Model(&origin).Updates(i).Error
+	return err
 }

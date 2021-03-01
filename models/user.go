@@ -2,6 +2,7 @@ package models
 
 import (
 	"issue-tracker/database"
+	"strconv"
 
 	"gorm.io/gorm"
 )
@@ -34,4 +35,19 @@ func (u *User) GetUserByEmail() *User {
 		return nil
 	}
 	return result
+}
+
+// GetUserRoleByID fetches a User's RoleID by searching its ID.
+// Returns a string and error.
+func (u *User) GetUserRoleByID(id int) (string, error) {
+	var result string
+	var user User
+
+	query := database.DB.Where("id = ?", id).First(&user)
+	if query.Error != nil {
+		return "", query.Error
+	}
+
+	result = strconv.Itoa(user.RoleID)
+	return result, nil
 }
