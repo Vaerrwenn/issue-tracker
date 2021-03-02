@@ -130,7 +130,15 @@ func (i *Issue) FindFirstIssueByID(id string) (*Issue, error) {
 	return &result, nil
 }
 
+// UpdateIssue updates an Issue data.
+// Takes an origin Issue as parameter. Origin issue is
+// the Issue that user will update.
 func (i *Issue) UpdateIssue(origin *Issue) error {
 	err := database.DB.Model(&origin).Updates(i).Error
+	return err
+}
+
+func (i *Issue) DeleteIssue() error {
+	err := database.DB.Delete(&i).Error
 	return err
 }

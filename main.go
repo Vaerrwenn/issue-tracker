@@ -51,6 +51,7 @@ func main() {
 				issue.GET("/index", controllers.IndexIssueHandler)
 				issue.GET("/show/:id", controllers.ShowIssueHandler)
 				issue.PATCH("/update/:id", controllers.UpdateIssueHandler)
+				issue.DELETE("/delete/:id", controllers.DeleteIssueHandler)
 			}
 		}
 

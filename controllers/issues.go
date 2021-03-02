@@ -120,6 +120,9 @@ func UpdateIssueHandler(c *gin.Context) {
 	var issue models.Issue
 	var user models.User
 
+	// Get Issue ID from param
+	// For example, update/3
+	// get that 3.
 	id := c.Param("id")
 	source, err := issue.FindFirstIssueByID(id)
 
@@ -137,7 +140,7 @@ func UpdateIssueHandler(c *gin.Context) {
 	HeaderUserID := c.Request.Header.Get("userID")
 	userID, err := strconv.Atoi(HeaderUserID)
 	if err != nil {
-		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		returnErrorAndAbort(c, http.StatusBadRequest, "couldn't parse UserID into Int")
 		return
 	}
 
@@ -147,7 +150,9 @@ func UpdateIssueHandler(c *gin.Context) {
 		return
 	}
 
+	// Checks whether User with the same ID can do this request.
 	if userID != source.UserID {
+		// Checks whether a User with different ID as the poster/author is a Developer.
 		if userRole != "2" {
 			returnErrorAndAbort(c, http.StatusBadRequest, "User is unauthorized for this request.")
 			return
@@ -181,5 +186,50 @@ func UpdateIssueHandler(c *gin.Context) {
 		"msg":  "Data has been updated succesfully.",
 	})
 
+	return
+}
+
+// DeleteIssueHandler deletes an Issue by ID.
+func DeleteIssueHandler(c *gin.Context) {
+	var issue models.Issue
+	var user models.User
+
+	id := c.Param("id")
+	source, err := issue.FindFirstIssueByID(id)
+
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	HeaderUserID := c.Request.Header.Get("userID")
+	userID, err := strconv.Atoi(HeaderUserID)
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, "couldn't parse UserID into Int")
+		return
+	}
+
+	userRole, err := user.GetUserRoleByID(userID)
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if userID != source.UserID {
+		if userRole != "2" {
+			returnErrorAndAbort(c, http.StatusBadRequest, "User is unauthorized for this request.")
+			return
+		}
+	}
+
+	if err := source.DeleteIssue(); err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, "Unable to delete issue")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": "deleted",
+		"msg":  "issue is deleted successfully",
+	})
 	return
 }
