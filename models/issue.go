@@ -13,31 +13,20 @@ import (
 // Issue Belongs To User
 type Issue struct {
 	gorm.Model
-	UserID   int
-	User     User
-	Title    string `gorm:"size:100"`
-	Body     string `gorm:"size:2000"`
-	Status   string `gorm:"size:1"` // 1 = Opened or 0 = Closed
-	Severity string `gorm:"size:1"` // 1 = Low, 2 = Medium, 3 = High
+	UserID            int
+	Title             string `gorm:"size:100"`
+	Body              string `gorm:"size:2000"`
+	Status            string `gorm:"size:1"` // 1 = Opened or 0 = Closed
+	Severity          string `gorm:"size:1"` // 1 = Low, 2 = Medium, 3 = High
+	UpdatedByUserID   int
+	UpdatedByUserName string `gorm:"size:100"`
+	Replies           []Reply
 }
 
 // IssueIndex is used for IndexIssue operation.
 type IssueIndex struct {
 	ID        int
 	Title     string
-	Status    string
-	Severity  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	UserID    int
-	UserName  string
-}
-
-// IssueShow is used for ShowIssue operation.
-type IssueShow struct {
-	ID        int
-	Title     string
-	Body      string
 	Status    string
 	Severity  string
 	CreatedAt time.Time
@@ -91,22 +80,9 @@ func (i *Issue) IndexIssues() (*[]IssueIndex, error) {
 
 // FindIssueByID fetches an issue with provided ID.
 // It will return issue and user data that is needed for Show route.
-func (i *Issue) FindIssueByID(id string) (*IssueShow, error) {
-	var result IssueShow
-	query := database.DB.Model(&Issue{}).
-		Select(`
-			issues.id,
-			issues.title,
-			issues.body,
-			issues.status,
-			issues.severity,
-			issues.created_at,
-			issues.updated_at,
-			issues.user_id,
-			users."name" AS "user_name"`).
-		Joins("left join users on issues.user_id = users.id").
-		Where("issues.id = ?", id).
-		Scan(&result)
+func (i *Issue) FindIssueByID(id string) (*Issue, error) {
+	var result Issue
+	query := database.DB.Preload("Replies").Where("issues.id = ?", id).First(&result)
 
 	if result.ID == 0 {
 		return nil, fmt.Errorf("ERROR: could not find issue with ID: %s", id)
@@ -120,15 +96,15 @@ func (i *Issue) FindIssueByID(id string) (*IssueShow, error) {
 
 // FindFirstIssueByID finds an issue by ID.
 // It will only return Issue data, without user's data.
-func (i *Issue) FindFirstIssueByID(id string) (*Issue, error) {
-	var result Issue
-	query := database.DB.Where("id = ?", id).First(&result)
+// func (i *Issue) FindFirstIssueByID(id string) (*Issue, error) {
+// 	var result Issue
+// 	query := database.DB.Where("id = ?", id).First(&result)
 
-	if query.Error != nil {
-		return nil, fmt.Errorf("ERROR: could not find issue with ID: %s", id)
-	}
-	return &result, nil
-}
+// 	if query.Error != nil {
+// 		return nil, fmt.Errorf("ERROR: could not find issue with ID: %s", id)
+// 	}
+// 	return &result, nil
+// }
 
 // UpdateIssue updates an Issue data.
 // Takes an origin Issue as parameter. Origin issue is
@@ -138,6 +114,7 @@ func (i *Issue) UpdateIssue(origin *Issue) error {
 	return err
 }
 
+// DeleteIssue deletes an Issue data.
 func (i *Issue) DeleteIssue() error {
 	err := database.DB.Delete(&i).Error
 	return err

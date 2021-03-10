@@ -26,11 +26,6 @@ type LoginForm struct {
 	Remembered bool   `form:"remember"`
 }
 
-// LoginResponse is used for token.
-type LoginResponse struct {
-	Token string `json:"token"`
-}
-
 // RegisterHandler inputs the form-data into the database.
 //
 // 1. The functions will get the form data.
@@ -40,6 +35,12 @@ type LoginResponse struct {
 //
 // 3. Send the data to the model to be saved to the database.
 func RegisterHandler(c *gin.Context) {
+	// Check whether user is logged in.
+	token := c.Request.Header.Get("token")
+	if token != "" {
+		returnErrorAndAbort(c, http.StatusForbidden, "User is already logged in.")
+		return
+	}
 	// Binds the form-data to `input` variable
 	var input RegisterForm
 	if err := c.ShouldBind(&input); err != nil {
@@ -96,6 +97,12 @@ func RegisterHandler(c *gin.Context) {
 //
 // 5. Send the Token to the Header.
 func LoginHandler(c *gin.Context) {
+	// Check whether user is logged in.
+	token := c.Request.Header.Get("token")
+	if token != "" {
+		returnErrorAndAbort(c, http.StatusForbidden, "User is already logged in.")
+		return
+	}
 	// Bind input from the Login form.
 	var input LoginForm
 	if err := c.ShouldBind(&input); err != nil {

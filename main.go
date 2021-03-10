@@ -13,10 +13,15 @@ import (
 )
 
 func main() {
-	// Loads variables on .env file as the machine's local environment.
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
+	// Loads variables on .env file as the machine's local environment if GIN_MODE is not "release".
+
+	mode := os.Getenv("GIN_MODE")
+
+	if mode != "release" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Printf(err.Error())
+		}
 	}
 
 	// Gets PORT on environment.
@@ -52,6 +57,7 @@ func main() {
 				issue.GET("/show/:id", controllers.ShowIssueHandler)
 				issue.PATCH("/update/:id", controllers.UpdateIssueHandler)
 				issue.DELETE("/delete/:id", controllers.DeleteIssueHandler)
+				issue.POST("/show/:id/reply", controllers.CreateReplyHandler)
 			}
 		}
 

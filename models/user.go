@@ -7,14 +7,17 @@ import (
 	"gorm.io/gorm"
 )
 
-// User belongs to Role
+// User belongs to a Role
 type User struct {
 	gorm.Model
-	RoleID   int
-	Role     Role
-	Name     string `gorm:"size:100"`
-	Email    string `gorm:"size:300"`
-	Password []byte
+	RoleID        int
+	Role          Role
+	Issues        []Issue
+	Replies       []Reply
+	Notifications []Notification
+	Name          string `gorm:"size:100"`
+	Email         string `gorm:"size:300"`
+	Password      []byte
 }
 
 // SaveUserData saves a User's data from Register.
@@ -50,4 +53,14 @@ func (u *User) GetUserRoleByID(id int) (string, error) {
 
 	result = strconv.Itoa(user.RoleID)
 	return result, nil
+}
+
+// GetUserByID gets a User data by ID.
+func (u *User) GetUserByID(id int) *User {
+	var result User
+	err := database.DB.Where("id = ?", id).First(&result).Error
+	if err != nil {
+		return nil
+	}
+	return &result
 }

@@ -44,8 +44,8 @@ func CreateIssueHandler(c *gin.Context) {
 	}
 
 	// Begin save Issue process.
-	HeaderUserID := c.Request.Header.Get("userID")
-	userID, err := strconv.Atoi(HeaderUserID)
+	headerUserID := c.Request.Header.Get("userID")
+	userID, err := strconv.Atoi(headerUserID)
 
 	if err != nil {
 		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
@@ -124,7 +124,7 @@ func UpdateIssueHandler(c *gin.Context) {
 	// For example, update/3
 	// get that 3.
 	id := c.Param("id")
-	source, err := issue.FindFirstIssueByID(id)
+	source, err := issue.FindIssueByID(id)
 
 	if err != nil {
 		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
@@ -144,8 +144,8 @@ func UpdateIssueHandler(c *gin.Context) {
 		return
 	}
 
-	userRole, err := user.GetUserRoleByID(userID)
-	if err != nil {
+	userSource := user.GetUserByID(userID)
+	if userSource == nil {
 		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -153,17 +153,19 @@ func UpdateIssueHandler(c *gin.Context) {
 	// Checks whether User with the same ID can do this request.
 	if userID != source.UserID {
 		// Checks whether a User with different ID as the poster/author is a Developer.
-		if userRole != "2" {
+		if userSource.RoleID != 2 {
 			returnErrorAndAbort(c, http.StatusBadRequest, "User is unauthorized for this request.")
 			return
 		}
 	}
 
 	issue = models.Issue{
-		Title:    input.Title,
-		Body:     input.Body,
-		Status:   input.Status,
-		Severity: input.Severity,
+		Title:             input.Title,
+		Body:              input.Body,
+		Status:            input.Status,
+		Severity:          input.Severity,
+		UpdatedByUserID:   int(userSource.ID),
+		UpdatedByUserName: userSource.Name,
 	}
 
 	if err := issue.ValidateIssue(); err != nil {
@@ -195,7 +197,7 @@ func DeleteIssueHandler(c *gin.Context) {
 	var user models.User
 
 	id := c.Param("id")
-	source, err := issue.FindFirstIssueByID(id)
+	source, err := issue.FindIssueByID(id)
 
 	if err != nil {
 		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())

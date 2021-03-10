@@ -6,6 +6,5 @@ import "gorm.io/gorm"
 type Notification struct {
 	gorm.Model
 	UserID int
-	User   User
 	Detail string `gorm:"size:300"`
 }
