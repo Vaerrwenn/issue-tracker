@@ -58,6 +58,7 @@ func main() {
 				issue.PATCH("/update/:id", controllers.UpdateIssueHandler)
 				issue.DELETE("/delete/:id", controllers.DeleteIssueHandler)
 				issue.POST("/show/:id/reply", controllers.CreateReplyHandler)
+				issue.PATCH("/show/:id/update-reply/:replyId", controllers.UpdateReplyHandler)
 			}
 		}
 

@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ReplyCreateForm is a struct for Form binding.
-type ReplyCreateForm struct {
+// ReplyCreateUpdateForm is a struct for Form binding on Create and Update operation.
+type ReplyCreateUpdateForm struct {
 	Body string `form:"description" binding:"required"`
 }
 
@@ -28,7 +28,7 @@ func CreateReplyHandler(c *gin.Context) {
 		returnErrorAndAbort(c, http.StatusForbidden, "User invalid.")
 	}
 
-	var input ReplyCreateForm
+	var input ReplyCreateUpdateForm
 	if err := c.ShouldBind(&input); err != nil {
 		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
 		return
@@ -53,7 +53,56 @@ func CreateReplyHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"msg": "Reply added successfully!",
+		"replyID": reply.ID,
+		"msg":     "Reply added successfully!",
+	})
+	return
+}
+
+// UpdateReplyHandler handles the Update request.
+func UpdateReplyHandler(c *gin.Context) {
+	userID, err := strconv.ParseUint(c.GetHeader("userID"), 10, 0)
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusForbidden, "User invalid.")
+		return
+	}
+
+	replyID, err := strconv.Atoi(c.Param("replyId"))
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusNotFound, "No reply ID provided.")
+		return
+	}
+
+	var reply models.Reply
+	replySouce := reply.FindReplyByID(uint(replyID))
+	if replySouce == nil {
+		returnErrorAndAbort(c, http.StatusNotFound, "Reply not found.")
+		return
+	}
+
+	if userID != uint64(replySouce.UserID) {
+		returnErrorAndAbort(c, http.StatusForbidden, "This user is not allowed to update this Reply.")
+		return
+	}
+
+	var input ReplyCreateUpdateForm
+	if err := c.ShouldBind(&input); err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	updateReply := models.Reply{
+		Body: input.Body,
+	}
+
+	err = updateReply.UpdateReply(replySouce)
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusNotAcceptable, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "Data successfully updated.",
 	})
 	return
 }
