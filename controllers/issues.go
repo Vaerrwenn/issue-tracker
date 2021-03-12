@@ -194,7 +194,6 @@ func UpdateIssueHandler(c *gin.Context) {
 // DeleteIssueHandler deletes an Issue by ID.
 func DeleteIssueHandler(c *gin.Context) {
 	var issue models.Issue
-	var user models.User
 
 	id := c.Param("id")
 	source, err := issue.FindIssueByID(id)
@@ -211,17 +210,9 @@ func DeleteIssueHandler(c *gin.Context) {
 		return
 	}
 
-	userRole, err := user.GetUserRoleByID(userID)
-	if err != nil {
-		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
 	if userID != source.UserID {
-		if userRole != "2" {
-			returnErrorAndAbort(c, http.StatusBadRequest, "User is unauthorized for this request.")
-			return
-		}
+		returnErrorAndAbort(c, http.StatusBadRequest, "User is unauthorized for this request.")
+		return
 	}
 
 	if err := source.DeleteIssue(); err != nil {

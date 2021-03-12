@@ -64,3 +64,9 @@ func (u *User) GetUserByID(id int) *User {
 	}
 	return &result
 }
+
+// UpdatePassword updates a User's password.
+func (u *User) UpdatePassword(newPassword []byte) error {
+	err := database.DB.Model(&u).Update("password", newPassword).Error
+	return err
+}

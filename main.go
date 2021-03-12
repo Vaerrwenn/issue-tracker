@@ -50,13 +50,17 @@ func main() {
 		protected := v1.Group("/protected")
 		protected.Use(middlewares.AuthJWT())
 		{
+			user := protected.Group("/user")
+			{
+				user.PATCH("/:id/change-password", controllers.ChangePasswordHandler)
+			}
 			issue := protected.Group("/issue")
 			{
 				issue.POST("/create", middlewares.RoleAuth("1"), controllers.CreateIssueHandler)
 				issue.GET("/index", controllers.IndexIssueHandler)
 				issue.GET("/show/:id", controllers.ShowIssueHandler)
 				issue.PATCH("/update/:id", controllers.UpdateIssueHandler)
-				issue.DELETE("/delete/:id", controllers.DeleteIssueHandler)
+				issue.DELETE("/delete/:id", middlewares.RoleAuth("1"), controllers.DeleteIssueHandler)
 				issue.POST("/show/:id/reply", controllers.CreateReplyHandler)
 				issue.PATCH("/show/:id/update-reply/:replyId", controllers.UpdateReplyHandler)
 				issue.DELETE("/show/:id/delete-reply/:replyId", controllers.DeleteReplyHandler)
