@@ -74,13 +74,13 @@ func UpdateReplyHandler(c *gin.Context) {
 	}
 
 	var reply models.Reply
-	replySouce := reply.FindReplyByID(uint(replyID))
-	if replySouce == nil {
+	replySource := reply.FindReplyByID(uint(replyID))
+	if replySource == nil {
 		returnErrorAndAbort(c, http.StatusNotFound, "Reply not found.")
 		return
 	}
 
-	if userID != uint64(replySouce.UserID) {
+	if userID != uint64(replySource.UserID) {
 		returnErrorAndAbort(c, http.StatusForbidden, "This user is not allowed to update this Reply.")
 		return
 	}
@@ -95,7 +95,7 @@ func UpdateReplyHandler(c *gin.Context) {
 		Body: input.Body,
 	}
 
-	err = updateReply.UpdateReply(replySouce)
+	err = updateReply.UpdateReply(replySource)
 	if err != nil {
 		returnErrorAndAbort(c, http.StatusNotAcceptable, err.Error())
 		return
@@ -103,6 +103,44 @@ func UpdateReplyHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"msg": "Data successfully updated.",
+	})
+	return
+}
+
+// DeleteReplyHandler handles a Deletion of a Reply.
+func DeleteReplyHandler(c *gin.Context) {
+	userID, err := strconv.ParseUint(c.GetHeader("userID"), 10, 0)
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusForbidden, "User invalid.")
+		return
+	}
+
+	replyID, err := strconv.Atoi(c.Param("replyId"))
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusNotFound, "No reply ID provided.")
+		return
+	}
+
+	var reply models.Reply
+	replySource := reply.FindReplyByID(uint(replyID))
+	if replySource == nil {
+		returnErrorAndAbort(c, http.StatusNotFound, "Reply not found.")
+		return
+	}
+
+	if userID != uint64(replySource.UserID) {
+		returnErrorAndAbort(c, http.StatusForbidden, "This user is not allowed to delete this Reply.")
+		return
+	}
+
+	err = replySource.DeleteReply()
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusNotAcceptable, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "Data successfully deleted.",
 	})
 	return
 }

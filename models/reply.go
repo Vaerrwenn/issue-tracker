@@ -37,3 +37,9 @@ func (r *Reply) UpdateReply(source *Reply) error {
 	err := database.DB.Model(&source).Updates(r).Error
 	return err
 }
+
+// DeleteReply deletes a Reply.
+func (r *Reply) DeleteReply() error {
+	err := database.DB.Delete(&r).Error
+	return err
+}
