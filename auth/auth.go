@@ -2,6 +2,8 @@ package auth
 
 import (
 	"errors"
+	"issue-tracker/models"
+	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -39,8 +41,8 @@ func (j *JwtWrapper) GenerateToken(email string) (string, error) {
 	return signedToken, nil
 }
 
-// ValidateToken validated the JWT token.
-func (j *JwtWrapper) ValidateToken(signedToken string) (claims *JwtClaim, err error) {
+// ValidateToken validates the JWT token brought by the Header.
+func (j *JwtWrapper) ValidateToken(signedToken string, userID string) (claims *JwtClaim, err error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&JwtClaim{},
@@ -55,6 +57,23 @@ func (j *JwtWrapper) ValidateToken(signedToken string) (claims *JwtClaim, err er
 	claims, ok := token.Claims.(*JwtClaim)
 	if !ok {
 		err = errors.New("couldn't parse claims")
+		return
+	}
+
+	userId, err := strconv.Atoi(userID)
+	if err != nil {
+		return
+	}
+
+	var user models.User
+	sourceUser := user.GetUserByID(userId)
+	if sourceUser == nil {
+		err = errors.New("Could not find User.")
+		return
+	}
+
+	if claims.Email != sourceUser.Email {
+		err = errors.New("INVALID TOKEN. You are not authorized to access this request.")
 		return
 	}
 

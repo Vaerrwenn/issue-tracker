@@ -12,10 +12,6 @@ import (
 // trying to use an API is authenticated or not.
 func AuthJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// err := godotenv.Load()
-		// if err != nil {
-		// 	log.Fatal("Error loading ENV file.")
-		// }
 		// Get the 'authorization' from the Header.
 		clientToken := c.Request.Header.Get("token")
 		if clientToken == "" {
@@ -25,7 +21,15 @@ func AuthJWT() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		// log.Println(clientToken)
+
+		userID := c.GetHeader("userID")
+		if userID == "" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "No userID in header.",
+			})
+			c.Abort()
+			return
+		}
 		// // Splits the Bearer and the token. (Used if the token has "Bearer " in front)
 		// extractedToken := strings.Split(clientToken, "Bearer ")
 		// log.Println(extractedToken)
@@ -45,7 +49,7 @@ func AuthJWT() gin.HandlerFunc {
 			Issuer:    "AuthService",
 		}
 
-		claims, err := jwtWrapper.ValidateToken(clientToken)
+		claims, err := jwtWrapper.ValidateToken(clientToken, userID)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": err.Error(),

@@ -53,6 +53,7 @@ func main() {
 			user := protected.Group("/user")
 			{
 				user.PATCH("/:id/change-password", controllers.ChangePasswordHandler)
+				user.GET("/:id", controllers.ShowUserHandler)
 			}
 			issue := protected.Group("/issue")
 			{

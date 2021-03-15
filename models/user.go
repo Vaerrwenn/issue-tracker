@@ -58,7 +58,7 @@ func (u *User) GetUserRoleByID(id int) (string, error) {
 // GetUserByID gets a User data by ID.
 func (u *User) GetUserByID(id int) *User {
 	var result User
-	err := database.DB.Where("id = ?", id).First(&result).Error
+	err := database.DB.Preload("Issues").Preload("Replies").Where("id = ?", id).First(&result).Error
 	if err != nil {
 		return nil
 	}

@@ -237,3 +237,28 @@ func ChangePasswordHandler(c *gin.Context) {
 	})
 	return
 }
+
+// ShowUserHandler handles Show User data request.
+//
+// Requires:
+//
+// - UserID from the param (URL)
+func ShowUserHandler(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, "No user ID provided.")
+		return
+	}
+
+	var user models.User
+	result := user.GetUserByID(userID)
+	if result == nil {
+		returnErrorAndAbort(c, http.StatusNotFound, "No User found.")
+		return
+	}
+	result.Password = nil
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": result,
+	})
+}

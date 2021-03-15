@@ -28,7 +28,7 @@ func TestValidateToken(t *testing.T) {
 		Issuer:    "AuthService",
 	}
 
-	claims, err := jwtWrapper.ValidateToken(encodedToken)
+	claims, err := jwtWrapper.ValidateToken(encodedToken, "1")
 	assert.NoError(t, err)
 
 	assert.Equal(t, "jwt@email.com", claims.Email)
