@@ -1,6 +1,6 @@
-# FixIt API
+# Purge API
 ## Description
-FixIt is a small issue tracker web application where Users with QA role can create, read, update, delete, reply, etc to issue. Users with Programmer role will be able to read, update, and reply to an issue.
+Purge is a small issue tracker web application where Users with QA role can create, read, update, delete, reply, etc to issue. Users with Programmer role will be able to read, update, and reply to an issue.
 
 **NOTE: This project page is just the API for the main project.**
 
