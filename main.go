@@ -39,6 +39,14 @@ func main() {
 	// Initiate Gin's default engine
 	r := gin.Default()
 
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{"data": "There is nothing here."})
+	})
+
+	r.GET("/robots", func(c *gin.Context) {
+		c.JSON(200, gin.H{"msg": "Please don't do anything bad to this service :)."})
+	})
+
 	v1 := r.Group("/v1")
 	{
 		// All requests on "/public" does not require any Header.
