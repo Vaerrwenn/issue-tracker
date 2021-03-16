@@ -15,6 +15,10 @@ Purge is a small issue tracker web application where Users with QA role can crea
 1. Download or Fork the code
 2. Run `go get ./..` to get all of the dependencies.
 
+**There are some environment variables that you need to add before running this project. Please add these variables before running:**
+* DATABASE_URL
+* JWT_SECRET
+
 ## Usage
 Run `go run main.go`
 
