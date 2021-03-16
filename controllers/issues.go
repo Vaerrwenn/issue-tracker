@@ -69,8 +69,8 @@ func CreateIssueHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": issue.ID,
-		"msg":  "Data succesfully created.",
+		"issueId": issue.ID,
+		"msg":     "Data succesfully created.",
 	})
 
 	return
