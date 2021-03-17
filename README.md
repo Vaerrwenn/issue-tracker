@@ -22,6 +22,9 @@ Purge is a small issue tracker web application where Users with QA role can crea
 ## Usage
 Run `go run main.go`
 
+## Documentation
+[Here](https://vaerrwenn.github.io/issue-tracker-back/)
+
 ## Contributing
 Please address an **issue** or **suggestion** in the Issues page of this project. Pull Requests are also welcomed but please provide documentations and test file.
 
