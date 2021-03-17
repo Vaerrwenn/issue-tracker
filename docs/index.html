@@ -13,7 +13,8 @@
     }
 
     .sidebar-menu a{
-        color: whitesmoke !important;
+        color: lightgreen !important;
+        text-decoration: none;
     }
 
     .thead-box {
@@ -29,9 +30,13 @@
     pre, code{
         white-space: pre-line;
     }
+
+    .note {
+        color: lightcoral !important;
+    }
 </style>
 <body class="text-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="https://github.com/Vaerrwenn/issue-tracker-back/" target="_blank">PURGE API</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,9 +64,9 @@
             <div class="col-3 sidebar-menu">
                 <table class="table table-hover table-bordered">
                     <thead>
-                        <tr class="table-primary">
+                        <tr class="table-light">
                             <th>
-                                <b>List of API Endpoint</b>
+                                List of API Endpoint
                             </th>
                         </tr>
                     </thead>
@@ -141,18 +146,34 @@
             </div>
             <!-- Content -->
             <div class="col-9">
-                <div class="row">
+                <div class="row py-4">
+                    <h1 class="display-6 text-danger" id="home-index">ERRORS</h1>
+                    <p>
+                        If an error happens, the endpoints will send a JSON.
+                    </p>
+                    <ul class="list-unstyled">
+                        <li><b>Returns:</b>
+                            <ul>
+                                <li>JSON:</li>
+                                <ul>
+                                    <li>err: {The error message varies.}</li>
+                                </ul>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row py-4">
                     <h1 class="display-6" id="home-index">GET: /</h1>
                     <p>This is the home index endpoint. 
                         It doesn't do much except returning a Never Gonna Give You Up by Rick Astley lyrics.</p>
                 </div>
-                <div class="row">
+                <div class="row py-4">
                     <h1 class="display-6" id="robots">GET: /robots</h1>
                     <p>This is another endpoint that will send a JSON message as follows:</p>
                     <p>{"msg": "Please don't do anything bad to this service :)."}</p>
                     <p>Usually it's for bots or web-scrapers for instructions of which stuffs are not allowed to be taken.</p>
                 </div>
-                <div class="row">
+                <div class="row py-4">
                     <h1 class="display-6" id="register">POST: /v1/public/register</h1>
                     <p>Register Endpoint. It will create User data.</p>
                     <ul class="list-unstyled">
@@ -168,15 +189,16 @@
                             </ul>
                         </li>
                         <li><b>Returns:</b>
-                            <ul class="list-unstyled">
-                                <li>
-                                    {"msg": "User registered successfully."}
-                                </li>
+                            <ul>
+                                <li>JSON:</li>
+                                <ul>
+                                    <li>msg: User registered successfully.</li>
+                                </ul>
                             </ul>
                         </li>
                     </ul>
                 </div>
-                <div class="row">
+                <div class="row py-4">
                     <h1 class="display-6" id="login">POST: /v1/public/login</h1>
                     <p>Login endpoint.</p>
                     <ul class="list-unstyled">
@@ -204,14 +226,25 @@
                         </li>
                     </ul>
                 </div>
-                <div class="row border-top">
-                    <p class="lead py-3 pe-5">
-                        NOTE: Protected API groups need "token" and "userId" on the Header. 
-                        So from here, you will have to provide "token" and "userId" on the Header
-                    </p>
+                <div class="row py-4 border-top note">
+                    <ul class="list-unstyled">
+                        <li><h1 class="lead">NOTE: </h1></li>
+                        <ul>
+                            <li>
+                                Protected API groups need "token" and "userId" on the Header. 
+                                So from here, you will have to provide "token" and "userId" on the Header
+                            </li>
+                            <li>
+                                :id or :replyId means that a number (for example, /v1/protected/issue/show/1)
+                                is stored as a variable with the variable's name as "id" and "replyId". Hence,
+                                in the example, the "id" has a value of "1".
+                            </li>
+                        </ul>
+                    </ul> 
+                    
                 </div>
-                <div class="row">
-                    <h1 class="display-6" id="change-password">PATCH: /v1/protected/user/:id/change-password</h1>
+                <div class="row py-4">
+                    <h1 class="display-6" id="change-pass">PATCH: /v1/protected/user/:id/change-password</h1>
                     <p>Change Password endpoint.</p>
                     <ul class="list-unstyled">
                         <li><b>Requires:</b>
@@ -225,15 +258,16 @@
                             </ul>
                         </li>
                         <li><b>Returns:</b>
-                            <ul class="list-unstyled">
-                                <li>
-                                    {"msg": "User registered successfully."}
-                                </li>
+                            <ul>
+                                <li>JSON:</li>
+                                <ul>
+                                    <li>msg: User registered successfully.</li>
+                                </ul>
                             </ul>
                         </li>
                     </ul>
                 </div>
-                <div class="row">
+                <div class="row py-4">
                     <h1 class="display-6" id="show-user">GET: /v1/protected/user/:id</h1>
                     <p>Change Password endpoint.</p>
                     <ul class="list-unstyled">
@@ -246,9 +280,9 @@
                         </li>
                     </ul>
                 </div>
-                <div class="row">
+                <div class="row py-4">
                     <h1 class="display-6" id="create-issue">POST: /v1/protected/issue/create</h1>
-                    <p>Create Issue endpoint.</p>
+                    <p>Create Issue endpoint. Create an Issue and store the data into the database.</p>
                     <ul class="list-unstyled">
                         <li><b>Requires:</b>
                             <ul>
@@ -264,15 +298,137 @@
                             <ul>
                                 <li>JSON with <b>Keys</b> as follows:</li>
                                 <ul>
-                                    <li>issueId</li>
+                                    <li>issueID</li>
                                     <li>msg: Data succesfully created.</li>
                                 </ul>
                             </ul>
                         </li>
                     </ul>
                 </div>
-                <div class="row">
-                    To be developed...
+                <div class="row py-4">
+                    <h1 class="display-6" id="index-issue">GET: /v1/protected/issue/index</h1>
+                    <p>Create Issue endpoint. Shows all Issues available.</p>
+                    <ul class="list-unstyled">
+                        <li><b>Returns:</b>
+                            <ul>
+                                <li>
+                                    PLEASE ASK THE DEVELOPER FOR THE RETURN VALUE.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row py-4">
+                    <h1 class="display-6" id="show-issue">GET: /v1/protected/issue/show/:id</h1>
+                    <p>Show Issue endpoint. Shows all Issues available.</p>
+                    <ul class="list-unstyled">
+                        <li><b>Returns:</b>
+                            <ul>
+                                <li>
+                                    PLEASE ASK THE DEVELOPER FOR THE RETURN VALUE.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row py-4">
+                    <h1 class="display-6" id="update-issue">PATCH: /v1/protected/issue/update/:id</h1>
+                    <p>Update Issue endpoint. Update an Issue and store the data into the database.</p>
+                    <ul class="list-unstyled">
+                        <li><b>Requires:</b>
+                            <ul>
+                                <li>Form data which input names as follow: (case sensitive)</li>
+                                <ul>
+                                    <li>title</li>
+                                    <li>description</li>
+                                    <li>status</li>
+                                    <li>severity</li>
+                                </ul>
+                            </ul>
+                        </li>
+                        <li><b>Returns:</b>
+                            <ul>
+                                <li>JSON with <b>Keys</b> as follows:</li>
+                                <ul>
+                                    <li>issueID</li>
+                                    <li>msg: Data has been updated succesfully.</li>
+                                </ul>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row py-4">
+                    <h1 class="display-6" id="delete-issue">DELETE: /v1/protected/issue/delete/:id</h1>
+                    <p>Delete Issue endpoint. Delete (softly) an Issue.</p>
+                    <ul class="list-unstyled">
+                        <li><b>Returns:</b>
+                            <ul>
+                                <li>JSON with <b>Keys</b> as follows:</li>
+                                <ul>
+                                    <li>msg: issue is deleted successfully</li>
+                                </ul>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row py-4">
+                    <h1 class="display-6" id="create-reply">POST: /v1/protected/issue/show/:id/reply</h1>
+                    <p>Create Reply endpoint. Create a Reply and store into database.</p>
+                    <ul class="list-unstyled">
+                        <li><b>Requires:</b>
+                            <ul>
+                                <li>Form data which input names as follow: (case sensitive)</li>
+                                <ul>
+                                    <li>description</li>
+                                </ul>
+                            </ul>
+                        </li>
+                        <li><b>Returns:</b>
+                            <ul>
+                                <li>JSON with <b>Keys</b> as follows:</li>
+                                <ul>
+                                    <li>replyID</li>
+                                    <li>msg: Reply added successfully!</li>
+                                </ul>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row py-4">
+                    <h1 class="display-6" id="update-reply">PATCH: /v1/protected/issue/show/:id/update-reply/:replyId</h1>
+                    <p>Update Reply endpoint. Update a Reply and store into database.</p>
+                    <ul class="list-unstyled">
+                        <li><b>Requires:</b>
+                            <ul>
+                                <li>Form data which input names as follow: (case sensitive)</li>
+                                <ul>
+                                    <li>description</li>
+                                </ul>
+                            </ul>
+                        </li>
+                        <li><b>Returns:</b>
+                            <ul>
+                                <li>JSON with <b>Keys</b> as follows:</li>
+                                <ul>
+                                    <li>msg: Data successfully updated.</li>
+                                </ul>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row py-4">
+                    <h1 class="display-6" id="delete-reply">DELETE: /v1/protected/issue/show/:id/delete-reply/:replyId</h1>
+                    <p>Delete Reply endpoint. Delete (softly) a Reply.</p>
+                    <ul class="list-unstyled">
+                        <li><b>Returns:</b>
+                            <ul>
+                                <li>JSON with <b>Keys</b> as follows:</li>
+                                <ul>
+                                    <li>msg: Data successfully deleted.</li>
+                                </ul>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

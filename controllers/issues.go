@@ -184,8 +184,8 @@ func UpdateIssueHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": idNum,
-		"msg":  "Data has been updated succesfully.",
+		"issueID": idNum,
+		"msg":     "Data has been updated succesfully.",
 	})
 
 	return
