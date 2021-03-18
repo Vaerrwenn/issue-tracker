@@ -198,9 +198,19 @@ func ChangePasswordHandler(c *gin.Context) {
 		return
 	}
 
+	userIDHeader, err := strconv.Atoi(c.GetHeader("userID"))
+	if err != nil {
+		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
 	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if userIDHeader != userID {
+		returnErrorAndAbort(c, http.StatusForbidden, "This user is not allowed to access this request.")
 		return
 	}
 
