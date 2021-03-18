@@ -16,7 +16,7 @@ type User struct {
 	Replies       []Reply
 	Notifications []Notification
 	Name          string `gorm:"size:100"`
-	Email         string `gorm:"size:300"`
+	Email         string `gorm:"size:300;unique;"`
 	Password      []byte
 }
 
