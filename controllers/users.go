@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -73,7 +74,7 @@ func RegisterHandler(c *gin.Context) {
 	user := models.User{
 		RoleID:   input.RoleID,
 		Name:     input.Name,
-		Email:    input.Email,
+		Email:    strings.ToLower(input.Email),
 		Password: hashedPassword,
 	}
 	// Saves user data.
@@ -121,7 +122,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 	userEmail := models.User{
-		Email: input.Email,
+		Email: strings.ToLower(input.Email),
 	}
 
 	// Check if user with inputted email exists.
