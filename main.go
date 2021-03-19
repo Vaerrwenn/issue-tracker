@@ -7,7 +7,9 @@ import (
 	migrations "issue-tracker/migrations"
 	"log"
 	"os"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -38,6 +40,17 @@ func main() {
 
 	// Initiate Gin's default engine
 	r := gin.Default()
+
+	// CORS stuff.
+	corsConfig := cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:8080"},
+		AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE"},
+		AllowHeaders:     []string{"*"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	})
+	r.Use(corsConfig)
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, "We're no strangers to love || You know the rules and so do I || "+
