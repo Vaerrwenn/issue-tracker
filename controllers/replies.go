@@ -52,11 +52,10 @@ func CreateReplyHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"replyID": reply.ID,
 		"msg":     "Reply added successfully!",
 	})
-	return
 }
 
 // UpdateReplyHandler handles the Update request.
@@ -104,7 +103,7 @@ func UpdateReplyHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"msg": "Data successfully updated.",
 	})
-	return
+
 }
 
 // DeleteReplyHandler handles a Deletion of a Reply.
@@ -139,8 +138,7 @@ func DeleteReplyHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusNoContent, gin.H{
 		"msg": "Data successfully deleted.",
 	})
-	return
 }

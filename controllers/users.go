@@ -87,11 +87,9 @@ func RegisterHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"msg": "User registered successfully.",
 	})
-
-	return
 }
 
 // LoginHandler handles the Login feature.
@@ -167,15 +165,13 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"token":     signedToken,
 		"userID":    user.ID,
 		"userRole":  user.RoleID,
 		"userEmail": user.Email,
 		"userName":  user.Name,
 	})
-
-	return
 }
 
 // ChangePasswordHandler handles user's change password request.
@@ -246,7 +242,6 @@ func ChangePasswordHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"msg": "Password updated successfully.",
 	})
-	return
 }
 
 // ShowUserHandler handles Show User data request.

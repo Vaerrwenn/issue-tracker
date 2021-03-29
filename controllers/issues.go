@@ -68,12 +68,10 @@ func CreateIssueHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"issueId": issue.ID,
 		"msg":     "Data succesfully created.",
 	})
-
-	return
 }
 
 // IndexIssueHandler shows ALL issues. 😢😢😢😢😢
@@ -90,7 +88,6 @@ func IndexIssueHandler(c *gin.Context) {
 		"qty":  len(*result),
 		"data": result,
 	})
-	return
 }
 
 // ShowIssueHandler fetch ONE issue by ID.
@@ -187,8 +184,6 @@ func UpdateIssueHandler(c *gin.Context) {
 		"issueID": idNum,
 		"msg":     "Data has been updated succesfully.",
 	})
-
-	return
 }
 
 // DeleteIssueHandler deletes an Issue by ID.
@@ -220,9 +215,8 @@ func DeleteIssueHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusNoContent, gin.H{
 		"data": "deleted",
 		"msg":  "issue is deleted successfully",
 	})
-	return
 }
