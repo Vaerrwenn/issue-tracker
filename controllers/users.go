@@ -30,9 +30,9 @@ type LoginForm struct {
 
 // ChangePasswordForm is for binding the data from Update Password form.
 type ChangePasswordForm struct {
-	OldPassword     string `form:"old-password" binding:"required"`
-	NewPassword     string `form:"new-password" binding:"required"`
-	ConfirmPassword string `form:"confirm-password" binding:"required"`
+	OldPassword     string `form:"old_password" binding:"required"`
+	NewPassword     string `form:"new_password" binding:"required"`
+	ConfirmPassword string `form:"confirm_password" binding:"required"`
 }
 
 // RegisterHandler inputs the form-data into the database.
