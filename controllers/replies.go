@@ -35,9 +35,14 @@ func CreateReplyHandler(c *gin.Context) {
 	}
 
 	var issue models.Issue
-	_, err = issue.FindIssueByID(strconv.Itoa(int(issueID)))
+	iss, err := issue.FindIssueByID(strconv.Itoa(int(issueID)))
 	if err != nil {
 		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if iss.Status != "1" {
+		returnErrorAndAbort(c, http.StatusNotAcceptable, "Issue is already closed!")
 		return
 	}
 
