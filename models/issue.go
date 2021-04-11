@@ -38,6 +38,7 @@ type IssueIndex struct {
 type IssueShow struct {
 	ID        int
 	Title     string
+	Body      string
 	Status    string
 	Severity  string
 	CreatedAt time.Time
@@ -108,6 +109,7 @@ func (i *Issue) FindIssueAndRepliesByID(id string) (*IssueShow, *[]RepliesInIssu
 		Select(`
 			issues.id,
 			issues.title,
+			issues.body,
 			issues.status,
 			issues.severity,
 			issues.created_at,
