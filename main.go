@@ -43,8 +43,8 @@ func main() {
 
 	// CORS stuff.
 	corsConfig := cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:8080", "https://purge-issue-tracker.herokuapp.com/"},
-		AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE"},
+		AllowOrigins:     []string{"http://localhost:8080", "https://purge-issue-tracker.herokuapp.com"},
+		AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE", "PUT", "OPTION"},
 		AllowHeaders:     []string{"*"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
