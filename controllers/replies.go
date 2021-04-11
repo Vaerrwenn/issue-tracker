@@ -35,7 +35,7 @@ func CreateReplyHandler(c *gin.Context) {
 	}
 
 	var issue models.Issue
-	iss, err := issue.FindIssueByID(strconv.Itoa(int(issueID)))
+	iss, err := issue.FindOneIssueByID(strconv.Itoa(int(issueID)))
 	if err != nil {
 		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
 		return

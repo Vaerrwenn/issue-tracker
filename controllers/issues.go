@@ -99,14 +99,15 @@ func ShowIssueHandler(c *gin.Context) {
 	var issue models.Issue
 
 	id := c.Param("id")
-	result, err := issue.FindIssueByID(id)
+	result, replies, err := issue.FindIssueAndRepliesByID(id)
 
 	if err != nil {
 		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"data": result,
+		"issue":   result,
+		"replies": replies,
 	})
 }
 
@@ -121,7 +122,7 @@ func UpdateIssueHandler(c *gin.Context) {
 	// For example, update/3
 	// get that 3.
 	id := c.Param("id")
-	source, err := issue.FindIssueByID(id)
+	source, err := issue.FindOneIssueByID(id)
 
 	if err != nil {
 		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())
@@ -191,7 +192,7 @@ func DeleteIssueHandler(c *gin.Context) {
 	var issue models.Issue
 
 	id := c.Param("id")
-	source, err := issue.FindIssueByID(id)
+	source, err := issue.FindOneIssueByID(id)
 
 	if err != nil {
 		returnErrorAndAbort(c, http.StatusBadRequest, err.Error())

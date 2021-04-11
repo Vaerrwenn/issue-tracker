@@ -35,6 +35,27 @@ type IssueIndex struct {
 	UserName  string
 }
 
+type IssueShow struct {
+	ID        int
+	Title     string
+	Status    string
+	Severity  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	UserID    int
+	UserName  string
+}
+
+type RepliesInIssue struct {
+	ID        int
+	UserID    int
+	IssueID   int
+	Body      string
+	Replier   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 // ValidateIssue validates the Issue data.
 // Some validation is done by GORM, but there are other validation,
 // id est Severity being only 1 - 3, needs to be validated manually.
@@ -78,14 +99,56 @@ func (i *Issue) IndexIssues() (*[]IssueIndex, error) {
 	return &issues, nil
 }
 
-// FindIssueByID fetches an issue with provided ID.
-// It will return issue and user data that is needed for Show route.
-func (i *Issue) FindIssueByID(id string) (*Issue, error) {
+// FindIssueAndRepliesByID fetches an issue with provided ID.
+// It will return issue, replies of that issue, and user data that is needed for Show route.
+func (i *Issue) FindIssueAndRepliesByID(id string) (*IssueShow, *[]RepliesInIssue, error) {
+	var issue IssueShow
+	// query := database.DB.Preload("Replies").Where("issues.id = ?", id).First(&result)
+	query := database.DB.Model(&Issue{}).
+		Select(`
+			issues.id,
+			issues.title,
+			issues.status,
+			issues.severity,
+			issues.created_at,
+			issues.updated_at,
+			issues.user_id,
+			users."name" AS "user_name"`).
+		Joins("left join users on issues.user_id = users.id").
+		Where("issues.id = ?", id).
+		First(&issue)
+
+	var replies []RepliesInIssue
+	queryReplies := database.DB.Model(&Reply{}).
+		Select(`
+			replies.id,
+			replies.user_id,
+			replies.issue_id,
+			users."name" as "replier",
+			replies.body,
+			replies.created_at,
+			replies.updated_at`).
+		Joins("join users on replies.user_id = users.id").
+		Joins("join issues on replies.issue_id = issues.id").
+		Where("replies.issue_id = ?", id).
+		Scan(&replies)
+
+	if issue.ID == 0 {
+		return nil, nil, fmt.Errorf("ERROR: could not find issue with ID: %s", id)
+	}
+
+	if query.Error != nil || queryReplies.Error != nil {
+		return nil, nil, query.Error
+	}
+	return &issue, &replies, nil
+}
+
+func (i *Issue) FindOneIssueByID(id string) (*Issue, error) {
 	var result Issue
 	query := database.DB.Preload("Replies").Where("issues.id = ?", id).First(&result)
 
 	if result.ID == 0 {
-		return nil, fmt.Errorf("ERROR: could not find issue with ID: %s", id)
+		return nil, fmt.Errorf("ERROR: Could not find issue with ID: %s", id)
 	}
 
 	if query.Error != nil {
@@ -93,18 +156,6 @@ func (i *Issue) FindIssueByID(id string) (*Issue, error) {
 	}
 	return &result, nil
 }
-
-// FindFirstIssueByID finds an issue by ID.
-// It will only return Issue data, without user's data.
-// func (i *Issue) FindFirstIssueByID(id string) (*Issue, error) {
-// 	var result Issue
-// 	query := database.DB.Where("id = ?", id).First(&result)
-
-// 	if query.Error != nil {
-// 		return nil, fmt.Errorf("ERROR: could not find issue with ID: %s", id)
-// 	}
-// 	return &result, nil
-// }
 
 // UpdateIssue updates an Issue data.
 // Takes an origin Issue as parameter. Origin issue is
